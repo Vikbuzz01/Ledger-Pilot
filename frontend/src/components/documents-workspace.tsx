@@ -369,8 +369,8 @@ export function DocumentsWorkspace({ businessId }: { businessId: string }) {
     <main className="mx-auto min-h-screen max-w-6xl px-5 py-10 sm:px-8">
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
-          <Link href="/dashboard" className="text-sm font-medium text-emerald-800 underline">← Business selection</Link>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800">LedgerPilot</p>
+          <Link href="/dashboard" className="text-sm font-medium text-gold-400 underline">← Business selection</Link>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-gold-400">LedgerPilot</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">Documents</h1>
           <p className="mt-2 text-sm text-slate-600">Statements and invoices remain private to this business.</p>
         </div>
@@ -392,7 +392,7 @@ export function DocumentsWorkspace({ businessId }: { businessId: string }) {
                 <label className="block space-y-1.5 text-sm font-medium">
                   Document type
                   <select
-                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3"
+                    className="h-10 w-full rounded-lg border border-slate-300 bg-elevated px-3 text-slate-900 focus:border-gold-400 focus:outline-none focus:ring-2 focus:ring-gold-400/30"
                     value={documentType}
                     onChange={(event) => { setDocumentType(event.target.value as DocumentRow["document_type"]); setFile(null); }}
                   >

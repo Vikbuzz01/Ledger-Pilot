@@ -158,7 +158,7 @@ export default function ReconciliationPage({ params }: { params: Promise<{ busin
   return (
     <main className="mx-auto min-h-screen max-w-7xl px-5 py-8 sm:px-8">
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div><Link href="/dashboard" className="text-sm text-emerald-800 underline">← Workspace</Link>
+        <div><Link href="/dashboard" className="text-sm text-gold-400 underline">← Workspace</Link>
           <h1 className="mt-2 text-3xl font-semibold">Reconciliation review</h1>
           <p className="mt-1 text-sm text-slate-600">Deterministic proposals remain unconfirmed until a reviewer approves them.</p>
         </div>

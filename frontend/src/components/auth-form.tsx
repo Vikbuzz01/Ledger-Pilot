@@ -47,14 +47,14 @@ export function AuthForm({ mode }: Props) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800">LedgerPilot</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-400">LedgerPilot</p>
         <CardTitle className="text-2xl">{registering ? "Create your account" : "Welcome back"}</CardTitle>
         <p className="text-sm text-slate-600">
           {registering ? "Set up a secure account to create your workspace." : "Sign in to your finance workspace."}
         </p>
         {!registering && process.env.NEXT_PUBLIC_DEMO_MODE === "true" && (
-          <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">
-            <p className="font-semibold">Demo workspace</p>
+          <div className="mt-4 rounded-lg border border-gold-600/50 bg-gold-400/5 p-3 text-sm text-slate-800">
+            <p className="font-semibold text-gold-400">Demo workspace</p>
             <p className="mt-1">Email: demo@ledgerpilot.com</p>
             <p>Password: LedgerPilot-Demo-2026!</p>
             <p className="mt-2 text-xs">Synthetic data only. Review proposed matches before approval.</p>
@@ -93,7 +93,7 @@ export function AuthForm({ mode }: Props) {
         </form>
         <p className="mt-5 text-sm text-slate-600">
           {registering ? "Already have an account? " : "New to LedgerPilot? "}
-          <Link className="font-medium text-emerald-800 underline-offset-4 hover:underline" href={registering ? "/login" : "/register"}>
+          <Link className="font-medium text-gold-400 underline-offset-4 hover:underline" href={registering ? "/login" : "/register"}>
             {registering ? "Sign in" : "Create an account"}
           </Link>
         </p>

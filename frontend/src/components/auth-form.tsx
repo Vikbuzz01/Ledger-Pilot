@@ -52,6 +52,14 @@ export function AuthForm({ mode }: Props) {
         <p className="text-sm text-slate-600">
           {registering ? "Set up a secure account to create your workspace." : "Sign in to your finance workspace."}
         </p>
+        {!registering && process.env.NEXT_PUBLIC_DEMO_MODE === "true" && (
+          <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">
+            <p className="font-semibold">Demo workspace</p>
+            <p className="mt-1">Email: demo@ledgerpilot.com</p>
+            <p>Password: LedgerPilot-Demo-2026!</p>
+            <p className="mt-2 text-xs">Synthetic data only. Review proposed matches before approval.</p>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={submit}>

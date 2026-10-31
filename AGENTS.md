@@ -16,8 +16,10 @@
 - When implementing reconciliation, separate candidate generation, scoring, rules, and confirmation. Preserve individual candidates with method, factors, confidence, status, and rationale.
 - When implementing AI investigation, separate tools, prompts, workflows, and evaluators; record tool executions, accessed record references, results, and timestamps. Abstract the model provider and validate structured outputs before storage.
 - Enforce business-level access in backend service/query boundaries; never trust a client-provided business identifier as authorization.
-- Resolve each business-scoped request against the authenticated user’s current membership in SQL Server. Do not trust JWT claims for business IDs or roles.
-- Use SQL Server as the supported database. Do not substitute SQLite or claim SQLite compatibility. Keep schema changes in Alembic and SQL Server administration scripts in `database/scripts/`.
+- Resolve each business-scoped request against the authenticated user's current membership in the selected database. Do not trust JWT claims for business IDs or roles.
+- Keep SQL Server Express as the primary development database. Preserve SQL Server schema changes in Alembic and administration scripts in `database/scripts/`.
+- SQLite is an optional local demo mode only. Initialize a new file from SQLAlchemy metadata, enable foreign keys, verify the application schema marker, and fail closed on unknown or older schemas. Do not claim SQL Server Alembic revisions run on SQLite; keep both database configurations independently tested.
+- Store financial amounts as SQL `DECIMAL(19,4)` on SQL Server and exact canonical decimal text on SQLite. Never use SQLite floating-point NUMERIC coercion for money; aggregate money as Python `Decimal`.
 - Store uploads outside `frontend/` using generated storage keys. Validate type and size before processing; hash files per business; add database uniqueness constraints for idempotency.
 - Keep extracted financial values unverified until a user explicitly confirms them. Preserve the original extracted value, source document ID, row/page location, origin, and verifier when applicable.
 - Treat incomplete, ambiguous, or failed extraction as visible review/error status. Make retries idempotent and preserve the source document.
@@ -32,3 +34,4 @@
 - Add focused tests for changed behavior. SQL Server integration and migration checks must clearly fail/report blocked when SQL Server is unavailable; never silently skip them.
 - At each phase boundary, report changed files, implemented behavior, dependencies, commands, test results, outstanding setup, and the recommended next phase.
 - Keep setup instructions current in `README.md` and dependencies minimal.
+- Keep Windows demo startup idempotent and non-destructive; reset must require explicit confirmation and affect only demo data.

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -262,6 +263,7 @@ function TransactionEditor({
 }
 
 export function DocumentsWorkspace({ businessId }: { businessId: string }) {
+  const router = useRouter();
   const [documents, setDocuments] = useState<DocumentRow[]>([]);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [documentType, setDocumentType] = useState<DocumentRow["document_type"]>("bank_csv");
@@ -278,14 +280,14 @@ export function DocumentsWorkspace({ businessId }: { businessId: string }) {
     } catch (cause) {
       if (cause instanceof Error && "status" in cause && cause.status === 401) {
         clearSession();
-        window.location.assign("/login");
+        router.push("/login");
       } else {
         setError(cause instanceof Error ? cause.message : "Documents could not be loaded.");
       }
     } finally {
       setLoading(false);
     }
-  }, [businessId]);
+  }, [businessId, router]);
 
   useEffect(() => { void loadDocuments(); }, [loadDocuments]);
 

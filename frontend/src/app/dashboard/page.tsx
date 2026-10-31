@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -10,14 +11,17 @@ import { apiRequest, clearSession, getSelectedBusinessId, setSelectedBusinessId 
 
 type User = { id: string; email: string; full_name: string };
 type Business = { id: string; name: string; role: "owner" | "admin" | "member" | "viewer" };
+type FinancialSummary = { total_transactions: number; matched_transactions: number; unmatched_transactions: number; exceptions: number; pending_approvals: number; investigations_in_progress: number; reconciliation_progress_percent: number };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(true);
+  const [summary, setSummary] = useState<FinancialSummary | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -33,16 +37,23 @@ export default function DashboardPage() {
       if (current) setSelectedBusinessId(current);
     } catch (cause) {
       clearSession();
-      window.location.assign("/login");
+      router.push("/login");
       setError(cause instanceof Error ? cause.message : "Please sign in again.");
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!selectedId) { setSummary(null); return; }
+    void apiRequest<FinancialSummary>(`/api/v1/businesses/${selectedId}/reconciliation/summary`)
+      .then(setSummary)
+      .catch(() => setSummary(null));
+  }, [selectedId]);
 
   async function createBusiness(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,7 +83,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-600">{user?.full_name}</span>
-          <Button variant="outline" size="sm" onClick={() => { clearSession(); window.location.assign("/login"); }}>
+          <Button variant="outline" size="sm" onClick={() => { clearSession(); router.push("/login"); }}>
             Sign out
           </Button>
         </div>
@@ -125,11 +136,17 @@ export default function DashboardPage() {
       </section>
 
       <section className="mt-8 rounded-xl border border-dashed border-slate-300 bg-white p-8">
-        <h2 className="text-lg font-semibold">Financial workspace</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          Your account and business access are active. Statements and invoices will appear in the selected business workspace.
-        </p>
-        {selectedId && <Link className="mt-4 inline-block text-sm font-medium text-emerald-800 underline" href={`/businesses/${selectedId}/documents`}>Open business workspace</Link>}
+        <h2 className="text-lg font-semibold">Reconciliation overview</h2>
+        {summary ? <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {[["Progress", `${summary.reconciliation_progress_percent}%`], ["Transactions", summary.total_transactions], ["Matched", summary.matched_transactions],
+            ["Unmatched", summary.unmatched_transactions], ["Open exceptions", summary.exceptions],
+            ["Pending approvals", summary.pending_approvals], ["Investigating", summary.investigations_in_progress]].map(([label, value]) =>
+            <div key={label} className="rounded-lg bg-slate-50 p-3"><p className="text-xs text-slate-500">{label}</p><p className="mt-1 text-xl font-semibold">{value}</p></div>)}
+        </div> : <p className="mt-2 text-sm text-slate-600">Verify imported records to prepare a reconciliation run.</p>}
+        {selectedId && <div className="mt-5 flex flex-wrap gap-4 text-sm font-medium text-emerald-800 underline">
+          <Link href={`/businesses/${selectedId}/documents`}>Documents and extraction review</Link>
+          <Link href={`/businesses/${selectedId}/reconciliation`}>Reconciliation, exceptions and approvals</Link>
+        </div>}
       </section>
     </main>
   );

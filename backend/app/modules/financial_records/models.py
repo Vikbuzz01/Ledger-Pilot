@@ -12,7 +12,6 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
-    Numeric,
     String,
     Unicode,
     UnicodeText,
@@ -23,6 +22,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+from app.db.types import MoneyAmount
 
 
 class BankTransaction(Base):
@@ -48,7 +48,7 @@ class BankTransaction(Base):
     source_row_number: Mapped[int] = mapped_column(Integer, nullable=False)
     transaction_date: Mapped[date | None] = mapped_column(Date)
     description: Mapped[str | None] = mapped_column(Unicode(500))
-    amount: Mapped[Decimal | None] = mapped_column(Numeric(19, 4, asdecimal=True))
+    amount: Mapped[Decimal | None] = mapped_column(MoneyAmount())
     currency: Mapped[str | None] = mapped_column(String(3))
     external_reference: Mapped[str | None] = mapped_column(Unicode(200))
     raw_data: Mapped[dict[str, str]] = mapped_column(JSON, nullable=False, default=dict)
@@ -78,7 +78,7 @@ class Invoice(Base):
     vendor_name: Mapped[str | None] = mapped_column(Unicode(200))
     invoice_date: Mapped[date | None] = mapped_column(Date)
     due_date: Mapped[date | None] = mapped_column(Date)
-    total_amount: Mapped[Decimal | None] = mapped_column(Numeric(19, 4, asdecimal=True))
+    total_amount: Mapped[Decimal | None] = mapped_column(MoneyAmount())
     currency: Mapped[str | None] = mapped_column(String(3))
     validation_errors: Mapped[list[dict[str, str]]] = mapped_column(
         JSON, nullable=False, default=list

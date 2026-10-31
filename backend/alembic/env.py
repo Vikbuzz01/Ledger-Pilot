@@ -11,14 +11,20 @@ from app.modules.businesses import models as business_models  # noqa: F401
 from app.modules.documents import models as document_models  # noqa: F401
 from app.modules.financial_records import models as financial_models  # noqa: F401
 from app.modules.identity import models as identity_models  # noqa: F401
+from app.modules.reconciliation import models as reconciliation_models  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option(
-    "sqlalchemy.url", get_settings().database_url.get_secret_value().replace("%", "%%")
-)
+settings = get_settings()
+if settings.database_mode != "sqlserver":
+    raise RuntimeError(
+        "Alembic revisions are SQL Server migrations. SQLite demo schemas are initialized "
+        "from SQLAlchemy metadata and checked against the demo schema version."
+    )
+assert settings.database_url is not None
+config.set_main_option("sqlalchemy.url", settings.database_url.get_secret_value().replace("%", "%%"))
 target_metadata = Base.metadata
 
 

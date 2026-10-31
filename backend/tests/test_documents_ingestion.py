@@ -1,7 +1,9 @@
 """Synthetic CSV/PDF upload, idempotency, provenance, and tenancy tests."""
 
+import shutil
 from collections.abc import Iterator
 from decimal import Decimal
+from pathlib import Path
 from uuid import uuid4
 
 import pymupdf
@@ -33,10 +35,11 @@ def _register_and_login(client: TestClient, email: str, name: str) -> dict[str, 
 
 
 @pytest.fixture
-def document_context(tmp_path, monkeypatch) -> Iterator[dict]:
+def document_context(monkeypatch) -> Iterator[dict]:
     from app.modules.documents import storage
 
-    monkeypatch.setattr(storage, "get_storage_root", lambda: tmp_path / "private-ledgerpilot-files")
+    storage_root = Path(__file__).resolve().parents[1] / "storage" / f"ingestion-{uuid4().hex}"
+    monkeypatch.setattr(storage, "get_storage_root", lambda: storage_root)
     client = TestClient(app)
     prefix = f"ingest-{uuid4().hex}"
     owner_headers = _register_and_login(client, f"{prefix}-owner@example.com", "Owner")
@@ -85,6 +88,7 @@ def document_context(tmp_path, monkeypatch) -> Iterator[dict]:
             db.execute(delete(BusinessMembership).where(BusinessMembership.user_id.in_(user_ids)))
             db.execute(delete(User).where(User.id.in_(user_ids)))
             db.commit()
+    shutil.rmtree(storage_root, ignore_errors=True)
 
 
 def _upload_csv(context: dict, content: bytes, filename: str = "statement.csv"):
@@ -141,7 +145,12 @@ def test_csv_hash_idempotency_provenance_verification_and_tenant_scope(document_
     assert len(detail["transactions"]) == 2
     assert Decimal(detail["transactions"][0]["amount"]) == Decimal("-12.34")
     assert Decimal(detail["transactions"][1]["amount"]) == Decimal("1250.50")
-    source = next(item for item in detail["provenance"] if item["field_name"] == "amount")
+    first_transaction_id = detail["transactions"][0]["id"]
+    source = next(
+        item
+        for item in detail["provenance"]
+        if item["field_name"] == "amount" and item["entity_id"] == first_transaction_id
+    )
     assert source["source_document_id"] == document_id
     assert source["source_location"] == "CSV row 2"
     assert source["value_origin"] == "extracted"

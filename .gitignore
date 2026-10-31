@@ -31,6 +31,8 @@ venv/
 ENV/
 env/
 .pytest_cache/
+.pytest-tmp-*/
+**/.test-temp/
 backend/pytest-cache-files-*/
 .coverage
 .coverage.*
@@ -72,6 +74,14 @@ backend/uploads/
 *.bak
 *.trn
 sqlserver-data/
+
+# Local SQLite demo/test databases and journals
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.db-*
 
 # Logs and temporary files
 *.log
